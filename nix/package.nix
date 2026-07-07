@@ -20,7 +20,9 @@ stdenv.mkDerivation rec {
 
   buildPhase = ''
     runHook preBuild
-    make -C drivers/aic8800 "${makeFlags[@]}"
+    make -C drivers/aic8800 \
+      KVER=${kernel.modDirVersion} \
+      KDIR=${kernel.dev}/lib/modules/${kernel.modDirVersion}/build
     runHook postBuild
   '';
 
