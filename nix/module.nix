@@ -2,6 +2,14 @@
 
 let
   cfg = config.hardware.aic8800d80;
+  firmwareDirs = [
+    "aic8800"
+    "aic8800D80"
+    "aic8800D80N"
+    "aic8800D80X2"
+    "aic8800DC"
+    "aic8800DLN"
+  ];
 in {
   options.hardware.aic8800d80 = {
     enable = lib.mkEnableOption "AIC8800D80 USB Wi-Fi/Bluetooth adapter support";
@@ -26,6 +34,10 @@ in {
     services.udev.packages = [ cfg.package ];
 
     hardware.bluetooth.enable = lib.mkDefault true;
+
+    systemd.tmpfiles.rules = map (dir:
+      "L+ /lib/firmware/${dir} - - - - ${cfg.package}/lib/firmware/${dir}"
+    ) firmwareDirs;
 
     environment.etc."usb_modeswitch.d/1111:1111".source = "${cfg.package}/etc/usb_modeswitch.d/1111:1111";
     environment.systemPackages = [ pkgs.usb-modeswitch ];
