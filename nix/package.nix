@@ -1,4 +1,4 @@
-{ lib, stdenv, kernel, utilLinux }:
+{ lib, stdenv, kernel, utilLinux, usbModeswitch } :
 
 stdenv.mkDerivation rec {
   pname = "aic8800d80";
@@ -15,7 +15,11 @@ stdenv.mkDerivation rec {
 
   postPatch = ''
     substituteInPlace aic.rules \
-      --replace-fail /usr/bin/eject ${utilLinux}/bin/eject
+      --replace-fail /usr/bin/eject ${utilLinux}/bin/eject \
+      --replace-fail /usr/sbin/usb_modeswitch ${usbModeswitch}/bin/usb_modeswitch \
+      --replace-fail /bin/sh ${stdenv.shell} \
+      --replace-fail "rfkill unblock bluetooth" "${utilLinux}/bin/rfkill unblock bluetooth" \
+      --replace-fail aic_btusb/new_id btusb/new_id
   '';
 
   buildPhase = ''

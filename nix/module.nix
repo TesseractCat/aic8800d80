@@ -11,8 +11,9 @@ in {
       default = pkgs.callPackage ./package.nix {
         kernel = config.boot.kernelPackages.kernel;
         utilLinux = pkgs.util-linux;
+        usbModeswitch = pkgs.usb-modeswitch;
       };
-      defaultText = lib.literalExpression "pkgs.callPackage ./nix/package.nix { kernel = config.boot.kernelPackages.kernel; utilLinux = pkgs.util-linux; }";
+      defaultText = lib.literalExpression "pkgs.callPackage ./nix/package.nix { kernel = config.boot.kernelPackages.kernel; utilLinux = pkgs.util-linux; usbModeswitch = pkgs.usb-modeswitch; }";
       description = "Package providing the AIC8800D80 kernel modules, firmware, udev rules, and usb_modeswitch data.";
     };
   };

@@ -14,10 +14,12 @@
         default = pkgs.callPackage ./nix/package.nix {
           kernel = pkgs.linuxPackages.kernel;
           utilLinux = pkgs.util-linux;
+          usbModeswitch = pkgs.usb-modeswitch;
         };
         aic8800d80 = pkgs.callPackage ./nix/package.nix {
           kernel = pkgs.linuxPackages.kernel;
           utilLinux = pkgs.util-linux;
+          usbModeswitch = pkgs.usb-modeswitch;
         };
       });
 
