@@ -27,6 +27,6 @@ in {
     hardware.bluetooth.enable = lib.mkDefault true;
 
     environment.etc."usb_modeswitch.d/1111:1111".source = "${cfg.package}/etc/usb_modeswitch.d/1111:1111";
-    environment.systemPackages = [ pkgs.usb_modeswitch ];
+    environment.systemPackages = [ pkgs.usb-modeswitch ];
   };
 }
