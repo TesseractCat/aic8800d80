@@ -19,6 +19,79 @@ Before installing the driver, delete all aic8800-related folders under /lib/firm
 
 #### Method 2: Manual Installation
 
+#### Method 3: NixOS / flakes
+
+> This branch provides both **Wi-Fi** and **Bluetooth** support.
+
+Add this repo as a flake input and enable the module:
+
+```nix
+{
+  inputs.aic8800d80.url = "github:shenmintao/aic8800d80?ref=bluetooth";
+
+  outputs = { nixpkgs, aic8800d80, ... }: {
+    nixosConfigurations.my-host = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [
+        aic8800d80.nixosModules.default
+        ({ ... }: {
+          hardware.aic8800d80.enable = true;
+        })
+      ];
+    };
+  };
+}
+```
+
+This module installs:
+- the `aic_load_fw` and `aic8800_fdrv` kernel modules
+- bundled firmware from `fw/`
+- udev rules for supported USB adapters
+- the `usb_modeswitch` config for `1111:1111` clone adapters
+- `btusb` is loaded so the in-kernel Bluetooth stack can bind after firmware upload
+- enables the NixOS Bluetooth stack by default
+
+#### Method 4: NixOS without flakes
+
+> This branch provides both **Wi-Fi** and **Bluetooth** support.
+
+Import the module from a pinned tarball:
+
+```nix
+{ config, pkgs, ... }:
+let
+  aic8800d80 = builtins.fetchTarball "https://github.com/shenmintao/aic8800d80/archive/refs/heads/bluetooth.tar.gz";
+in {
+  imports = [
+    (import "${aic8800d80}/module.nix")
+  ];
+
+  hardware.aic8800d80.enable = true;
+}
+```
+
+Or install just the package:
+
+```nix
+{ pkgs, ... }:
+let
+  aic8800d80 = import (builtins.fetchTarball "https://github.com/shenmintao/aic8800d80/archive/refs/heads/bluetooth.tar.gz") {
+    inherit pkgs;
+    kernel = pkgs.linuxPackages.kernel;
+  };
+in {
+  boot.kernelModules = [ "aic_load_fw" "aic8800_fdrv" "btusb" ];
+  boot.extraModulePackages = [ aic8800d80 ];
+  hardware.firmware = [ aic8800d80 ];
+  hardware.bluetooth.enable = true;
+  services.udev.packages = [ aic8800d80 ];
+  environment.etc."usb_modeswitch.d/1111:1111".source = "${aic8800d80}/etc/usb_modeswitch.d/1111:1111";
+  environment.systemPackages = [ pkgs.usb_modeswitch ];
+}
+```
+
+
+
 #### Copy udev rules:
 Copy the aic.rules file to /lib/udev/rules.d/:
 
